@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quellenfinder</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>Quellenfinder für Unterrichtsmaterialien</h1>
+    <p>Filterbare Sammlung seriöser Quellen für Lehrkräfte und Schüler:innen</p>
+  </header>
+
+  <main class="container">
+    <section class="filters">
+      <h2>Filter</h2>
+
+      <div class="filter-group">
+        <label for="searchInput">Suche</label>
+        <input type="text" id="searchInput" placeholder="Nach Titel, Anbieter oder Beschreibung suchen..." />
+      </div>
+
+      <div class="filter-group">
+        <label for="languageFilter">Sprache</label>
+        <select id="languageFilter">
+          <option value="">Alle</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="sourceTypeFilter">Quellenart</label>
+        <select id="sourceTypeFilter">
+          <option value="">Alle</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="eventCategoryFilter">Ereigniskategorie</label>
+        <select id="eventCategoryFilter">
+          <option value="">Alle</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="timeCategoryFilter">Zeitliche Kategorie</label>
+        <select id="timeCategoryFilter">
+          <option value="">Alle</option>
+        </select>
+      </div>
+
+      <button id="resetFilters">Filter zurücksetzen</button>
+    </section>
+
+    <section class="results-section">
+      <div class="results-header">
+        <h2>Ergebnisse</h2>
+        <p id="resultsCount"></p>
+      </div>
+
+      <div id="results" class="results"></div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

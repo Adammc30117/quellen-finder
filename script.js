@@ -8,11 +8,23 @@ const eventCategoryFilter = document.getElementById("eventCategoryFilter");
 const timeCategoryFilter = document.getElementById("timeCategoryFilter");
 const resetFiltersButton = document.getElementById("resetFilters");
 
+function splitValues(value) {
+  if (!value) return [];
+
+  return value
+    .split(/;|,/)
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
 function getUniqueValues(key) {
-  return [...new Set(sources.map(s => s[key]).filter(Boolean))];
+  const allValues = sources.flatMap(source => splitValues(source[key]));
+  return [...new Set(allValues)].sort();
 }
 
 function populateDropdown(selectElement, values) {
+  selectElement.innerHTML = `<option value="">Alle</option>`;
+
   values.forEach(value => {
     const option = document.createElement("option");
     option.value = value;
@@ -21,23 +33,51 @@ function populateDropdown(selectElement, values) {
   });
 }
 
-function renderSources(filtered) {
-  resultsContainer.innerHTML = "";
-  resultsCount.textContent = `${filtered.length} Quelle(n) gefunden`;
+function createTags(value) {
+  return splitValues(value)
+    .map(item => `<span class="tag">${item}</span>`)
+    .join("");
+}
 
-  filtered.forEach(source => {
+function renderSources(filteredSources) {
+  resultsContainer.innerHTML = "";
+
+  resultsCount.textContent = `${filteredSources.length} Quelle(n) gefunden`;
+
+  if (filteredSources.length === 0) {
+    resultsContainer.innerHTML = `
+      <div class="no-results">
+        Keine passenden Quellen gefunden.
+      </div>
+    `;
+    return;
+  }
+
+  filteredSources.forEach(source => {
     const card = document.createElement("div");
     card.className = "card";
 
+    const provider = source.provider || "Keine Angabe";
+    const description = source.description || "Keine Kurzbeschreibung vorhanden.";
+    const title = source.title || "Ohne Titel";
+
     card.innerHTML = `
-      <h3>${source.title}</h3>
-      <p><strong>Anbieter:</strong> ${source.provider}</p>
-      <p>${source.description}</p>
-      <p><strong>Sprache:</strong> ${source.language}</p>
-      <p><strong>Typ:</strong> ${source.sourceType}</p>
-      <p><strong>Kategorie:</strong> ${source.eventCategory}</p>
-      <p><strong>Zeit:</strong> ${source.timeCategory}</p>
-      <a href="${source.url}" target="_blank">Zur Quelle</a>
+      <h3>${title}</h3>
+
+      <p><strong>Anbieter:</strong> ${provider}</p>
+
+      <p>${description}</p>
+
+      <div class="tags">
+        ${createTags(source.language)}
+        ${createTags(source.sourceType)}
+        ${createTags(source.eventCategory)}
+        ${createTags(source.timeCategory)}
+      </div>
+
+      <a href="${source.url}" target="_blank" rel="noopener noreferrer">
+        Quelle öffnen
+      </a>
     `;
 
     resultsContainer.appendChild(card);
@@ -45,30 +85,80 @@ function renderSources(filtered) {
 }
 
 function filterSources() {
-  const search = searchInput.value.toLowerCase();
-  const lang = languageFilter.value;
-  const type = sourceTypeFilter.value;
-  const event = eventCategoryFilter.value;
-  const time = timeCategoryFilter.value;
+  const searchValue = searchInput.value.toLowerCase().trim();
 
-  const filtered = sources.filter(s =>
-    (s.title.toLowerCase().includes(search) ||
-     s.description.toLowerCase().includes(search)) &&
-    (!lang || s.language === lang) &&
-    (!type || s.sourceType === type) &&
-    (!event || s.eventCategory === event) &&
-    (!time || s.timeCategory === time)
-  );
+  const selectedLanguage = languageFilter.value;
+  const selectedSourceType = sourceTypeFilter.value;
+  const selectedEventCategory = eventCategoryFilter.value;
+  const selectedTimeCategory = timeCategoryFilter.value;
+
+  const filtered = sources.filter(source => {
+
+    const safeSource = {
+      title: source.title || "",
+      provider: source.provider || "",
+      subject: source.subject || "",
+      contentField: source.contentField || "",
+      timeCategory: source.timeCategory || "",
+      eventCategory: source.eventCategory || "",
+      sourceType: source.sourceType || "",
+      language: source.language || "",
+      description: source.description || "",
+      notes: source.notes || ""
+    };
+
+    const searchableText = `
+      ${safeSource.title}
+      ${safeSource.provider}
+      ${safeSource.subject}
+      ${safeSource.contentField}
+      ${safeSource.timeCategory}
+      ${safeSource.eventCategory}
+      ${safeSource.sourceType}
+      ${safeSource.language}
+      ${safeSource.description}
+      ${safeSource.notes}
+    `.toLowerCase();
+
+    const matchesSearch =
+      !searchValue || searchableText.includes(searchValue);
+
+    const matchesLanguage =
+      !selectedLanguage ||
+      splitValues(source.language).includes(selectedLanguage);
+
+    const matchesSourceType =
+      !selectedSourceType ||
+      splitValues(source.sourceType).includes(selectedSourceType);
+
+    const matchesEventCategory =
+      !selectedEventCategory ||
+      splitValues(source.eventCategory).includes(selectedEventCategory);
+
+    const matchesTimeCategory =
+      !selectedTimeCategory ||
+      splitValues(source.timeCategory).includes(selectedTimeCategory);
+
+    return (
+      matchesSearch &&
+      matchesLanguage &&
+      matchesSourceType &&
+      matchesEventCategory &&
+      matchesTimeCategory
+    );
+  });
 
   renderSources(filtered);
 }
 
 function resetFilters() {
   searchInput.value = "";
+
   languageFilter.value = "";
   sourceTypeFilter.value = "";
   eventCategoryFilter.value = "";
   timeCategoryFilter.value = "";
+
   renderSources(sources);
 }
 
@@ -84,4 +174,5 @@ languageFilter.addEventListener("change", filterSources);
 sourceTypeFilter.addEventListener("change", filterSources);
 eventCategoryFilter.addEventListener("change", filterSources);
 timeCategoryFilter.addEventListener("change", filterSources);
+
 resetFiltersButton.addEventListener("click", resetFilters);

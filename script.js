@@ -12,7 +12,11 @@ function splitValues(value) {
   if (!value) return [];
 
   return value
-    .split(/;|,/)
+    .replace("German English", "Deutsch; Englisch")
+    .replace("English German", "Englisch; Deutsch")
+    .replace("German", "Deutsch")
+    .replace("English", "Englisch")
+    .split(/;|,|\+/)
     .map(item => item.trim())
     .filter(Boolean);
 }

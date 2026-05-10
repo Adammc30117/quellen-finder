@@ -18,6 +18,32 @@ function splitValues(value) {
 }
 
 function getUniqueValues(key) {
+
+  if (key === "language") {
+
+    const values = [];
+
+    sources.forEach(source => {
+
+      const langs = splitValues(source.language);
+
+      if (langs.includes("Deutsch") && langs.includes("Englisch")) {
+        values.push("Deutsch + Englisch");
+      }
+
+      if (langs.includes("Deutsch") && !langs.includes("Englisch")) {
+        values.push("Deutsch");
+      }
+
+      if (langs.includes("Englisch") && !langs.includes("Deutsch")) {
+        values.push("Englisch");
+      }
+
+    });
+
+    return [...new Set(values)].sort();
+  }
+
   const allValues = sources.flatMap(source => splitValues(source[key]));
   return [...new Set(allValues)].sort();
 }
@@ -106,8 +132,27 @@ function filterSources() {
     const matchesSearch =
       !searchValue || searchableText.includes(searchValue);
 
-    const matchesLanguage =
-      !selectedLanguage || splitValues(source.language).includes(selectedLanguage);
+    const langs = splitValues(source.language);
+
+        let matchesLanguage = !selectedLanguage;
+        
+        if (selectedLanguage === "Deutsch") {
+          matchesLanguage =
+            langs.includes("Deutsch") &&
+            !langs.includes("Englisch");
+        }
+        
+        if (selectedLanguage === "Englisch") {
+          matchesLanguage =
+            langs.includes("Englisch") &&
+            !langs.includes("Deutsch");
+        }
+        
+        if (selectedLanguage === "Deutsch + Englisch") {
+          matchesLanguage =
+            langs.includes("Deutsch") &&
+            langs.includes("Englisch");
+        }
 
     const matchesSourceType =
       !selectedSourceType || splitValues(source.sourceType).includes(selectedSourceType);

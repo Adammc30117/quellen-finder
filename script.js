@@ -155,7 +155,7 @@ function renderSources(filteredSources) {
       </p>
 
       <div class="topic-box">
-        <strong>Themenbereiche:</strong>
+        <strong>Inhaltsfelder:</strong>
 
         <p>${contentField}</p>
       </div>

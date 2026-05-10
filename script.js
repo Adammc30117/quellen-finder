@@ -41,7 +41,6 @@ function createTags(value) {
 
 function renderSources(filteredSources) {
   resultsContainer.innerHTML = "";
-
   resultsCount.textContent = `${filteredSources.length} Quelle(n) gefunden`;
 
   if (filteredSources.length === 0) {
@@ -57,15 +56,13 @@ function renderSources(filteredSources) {
     const card = document.createElement("div");
     card.className = "card";
 
+    const title = source.title || "Ohne Titel";
     const provider = source.provider || "Keine Angabe";
     const description = source.description || "Keine Kurzbeschreibung vorhanden.";
-    const title = source.title || "Ohne Titel";
 
     card.innerHTML = `
       <h3>${title}</h3>
-
       <p><strong>Anbieter:</strong> ${provider}</p>
-
       <p>${description}</p>
 
       <div class="tags">
@@ -93,51 +90,33 @@ function filterSources() {
   const selectedTimeCategory = timeCategoryFilter.value;
 
   const filtered = sources.filter(source => {
-
-    const safeSource = {
-      title: source.title || "",
-      provider: source.provider || "",
-      subject: source.subject || "",
-      contentField: source.contentField || "",
-      timeCategory: source.timeCategory || "",
-      eventCategory: source.eventCategory || "",
-      sourceType: source.sourceType || "",
-      language: source.language || "",
-      description: source.description || "",
-      notes: source.notes || ""
-    };
-
     const searchableText = `
-      ${safeSource.title}
-      ${safeSource.provider}
-      ${safeSource.subject}
-      ${safeSource.contentField}
-      ${safeSource.timeCategory}
-      ${safeSource.eventCategory}
-      ${safeSource.sourceType}
-      ${safeSource.language}
-      ${safeSource.description}
-      ${safeSource.notes}
+      ${source.title || ""}
+      ${source.provider || ""}
+      ${source.subject || ""}
+      ${source.contentField || ""}
+      ${source.timeCategory || ""}
+      ${source.eventCategory || ""}
+      ${source.sourceType || ""}
+      ${source.language || ""}
+      ${source.description || ""}
+      ${source.notes || ""}
     `.toLowerCase();
 
     const matchesSearch =
       !searchValue || searchableText.includes(searchValue);
 
     const matchesLanguage =
-      !selectedLanguage ||
-      splitValues(source.language).includes(selectedLanguage);
+      !selectedLanguage || splitValues(source.language).includes(selectedLanguage);
 
     const matchesSourceType =
-      !selectedSourceType ||
-      splitValues(source.sourceType).includes(selectedSourceType);
+      !selectedSourceType || splitValues(source.sourceType).includes(selectedSourceType);
 
     const matchesEventCategory =
-      !selectedEventCategory ||
-      splitValues(source.eventCategory).includes(selectedEventCategory);
+      !selectedEventCategory || splitValues(source.eventCategory).includes(selectedEventCategory);
 
     const matchesTimeCategory =
-      !selectedTimeCategory ||
-      splitValues(source.timeCategory).includes(selectedTimeCategory);
+      !selectedTimeCategory || splitValues(source.timeCategory).includes(selectedTimeCategory);
 
     return (
       matchesSearch &&
@@ -153,7 +132,6 @@ function filterSources() {
 
 function resetFilters() {
   searchInput.value = "";
-
   languageFilter.value = "";
   sourceTypeFilter.value = "";
   eventCategoryFilter.value = "";
@@ -174,5 +152,4 @@ languageFilter.addEventListener("change", filterSources);
 sourceTypeFilter.addEventListener("change", filterSources);
 eventCategoryFilter.addEventListener("change", filterSources);
 timeCategoryFilter.addEventListener("change", filterSources);
-
 resetFiltersButton.addEventListener("click", resetFilters);

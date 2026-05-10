@@ -88,7 +88,12 @@ function renderSources(filteredSources) {
 
     const title = source.title || "Ohne Titel";
     const provider = source.provider || "Keine Angabe";
-    const description = source.description || "Keine Kurzbeschreibung vorhanden.";
+
+    const description =
+      source.description || "Keine Kurzbeschreibung vorhanden.";
+    
+    const contentField =
+      source.contentField || "Keine Themenbereiche angegeben.";
 
     card.innerHTML = `
       <h3>${title}</h3>

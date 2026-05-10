@@ -22,13 +22,10 @@ function splitValues(value) {
 }
 
 function getUniqueValues(key) {
-
   if (key === "language") {
-
     const values = [];
 
     sources.forEach(source => {
-
       const langs = splitValues(source.language);
 
       if (langs.includes("Deutsch") && langs.includes("Englisch")) {
@@ -42,7 +39,6 @@ function getUniqueValues(key) {
       if (langs.includes("Englisch") && !langs.includes("Deutsch")) {
         values.push("Englisch");
       }
-
     });
 
     return [...new Set(values)].sort();
@@ -69,6 +65,32 @@ function createTags(value) {
     .join("");
 }
 
+function hasActiveFilters() {
+  return (
+    searchInput.value.trim() !== "" ||
+    languageFilter.value !== "" ||
+    sourceTypeFilter.value !== "" ||
+    eventCategoryFilter.value !== "" ||
+    timeCategoryFilter.value !== ""
+  );
+}
+
+function renderStartMessage() {
+  resultsCount.textContent = "";
+
+  resultsContainer.innerHTML = `
+    <div class="start-message">
+      <h3>Starte deine Suche</h3>
+      <p>
+        Gib einen Suchbegriff ein oder wähle links einen Filter aus, um passende Quellen anzuzeigen.
+      </p>
+      <p class="start-message-small">
+        Du kannst zum Beispiel nach Sprache, Quellenart, Ereigniskategorie oder Zeitraum filtern.
+      </p>
+    </div>
+  `;
+}
+
 function renderSources(filteredSources) {
   resultsContainer.innerHTML = "";
   resultsCount.textContent = `${filteredSources.length} Quelle(n) gefunden`;
@@ -76,21 +98,19 @@ function renderSources(filteredSources) {
   if (filteredSources.length === 0) {
     resultsContainer.innerHTML = `
       <div class="no-results">
-        Keine passenden Quellen gefunden.
+        <h3>Keine passenden Quellen gefunden</h3>
+        <p>Versuche einen anderen Suchbegriff oder setze einzelne Filter zurück.</p>
       </div>
     `;
     return;
   }
 
   filteredSources.forEach(source => {
-
     const card = document.createElement("div");
     card.className = "card";
 
     const title = source.title || "Ohne Titel";
-
-    const provider =
-      source.provider || "Keine Angabe";
+    const provider = source.provider || "Keine Angabe";
 
     const description =
       source.description || "Keine Kurzbeschreibung vorhanden.";
@@ -99,19 +119,23 @@ function renderSources(filteredSources) {
       source.contentField || "Keine Themenbereiche angegeben.";
 
     card.innerHTML = `
+      <div class="card-topline">
+        <span>${source.id || "Quelle"}</span>
+      </div>
+
       <h3>${title}</h3>
 
-      <p>
+      <p class="provider">
         <strong>Anbieter:</strong>
         ${provider}
       </p>
 
-      <p>${description}</p>
+      <p class="description">${description}</p>
 
-      <p>
+      <div class="topic-box">
         <strong>Themenbereiche:</strong>
-        ${contentField}
-      </p>
+        <p>${contentField}</p>
+      </div>
 
       <div class="tags">
         ${createTags(source.language)}
@@ -120,35 +144,29 @@ function renderSources(filteredSources) {
         ${createTags(source.timeCategory)}
       </div>
 
-      <a href="${source.url}" target="_blank" rel="noopener noreferrer">
+      <a class="source-button" href="${source.url}" target="_blank" rel="noopener noreferrer">
         Quelle öffnen
       </a>
     `;
 
     resultsContainer.appendChild(card);
-
   });
 }
 
 function filterSources() {
+  if (!hasActiveFilters()) {
+    renderStartMessage();
+    return;
+  }
 
-  const searchValue =
-    searchInput.value.toLowerCase().trim();
+  const searchValue = searchInput.value.toLowerCase().trim();
 
-  const selectedLanguage =
-    languageFilter.value;
-
-  const selectedSourceType =
-    sourceTypeFilter.value;
-
-  const selectedEventCategory =
-    eventCategoryFilter.value;
-
-  const selectedTimeCategory =
-    timeCategoryFilter.value;
+  const selectedLanguage = languageFilter.value;
+  const selectedSourceType = sourceTypeFilter.value;
+  const selectedEventCategory = eventCategoryFilter.value;
+  const selectedTimeCategory = timeCategoryFilter.value;
 
   const filtered = sources.filter(source => {
-
     const searchableText = `
       ${source.title || ""}
       ${source.provider || ""}
@@ -163,14 +181,11 @@ function filterSources() {
     `.toLowerCase();
 
     const matchesSearch =
-      !searchValue ||
-      searchableText.includes(searchValue);
+      !searchValue || searchableText.includes(searchValue);
 
-    const langs =
-      splitValues(source.language);
+    const langs = splitValues(source.language);
 
-    let matchesLanguage =
-      !selectedLanguage;
+    let matchesLanguage = !selectedLanguage;
 
     if (selectedLanguage === "Deutsch") {
       matchesLanguage =
@@ -192,18 +207,15 @@ function filterSources() {
 
     const matchesSourceType =
       !selectedSourceType ||
-      splitValues(source.sourceType)
-        .includes(selectedSourceType);
+      splitValues(source.sourceType).includes(selectedSourceType);
 
     const matchesEventCategory =
       !selectedEventCategory ||
-      splitValues(source.eventCategory)
-        .includes(selectedEventCategory);
+      splitValues(source.eventCategory).includes(selectedEventCategory);
 
     const matchesTimeCategory =
       !selectedTimeCategory ||
-      splitValues(source.timeCategory)
-        .includes(selectedTimeCategory);
+      splitValues(source.timeCategory).includes(selectedTimeCategory);
 
     return (
       matchesSearch &&
@@ -212,14 +224,12 @@ function filterSources() {
       matchesEventCategory &&
       matchesTimeCategory
     );
-
   });
 
   renderSources(filtered);
 }
 
 function resetFilters() {
-
   searchInput.value = "";
 
   languageFilter.value = "";
@@ -227,57 +237,19 @@ function resetFilters() {
   eventCategoryFilter.value = "";
   timeCategoryFilter.value = "";
 
-  renderSources(sources);
+  renderStartMessage();
 }
 
-populateDropdown(
-  languageFilter,
-  getUniqueValues("language")
-);
+populateDropdown(languageFilter, getUniqueValues("language"));
+populateDropdown(sourceTypeFilter, getUniqueValues("sourceType"));
+populateDropdown(eventCategoryFilter, getUniqueValues("eventCategory"));
+populateDropdown(timeCategoryFilter, getUniqueValues("timeCategory"));
 
-populateDropdown(
-  sourceTypeFilter,
-  getUniqueValues("sourceType")
-);
+renderStartMessage();
 
-populateDropdown(
-  eventCategoryFilter,
-  getUniqueValues("eventCategory")
-);
-
-populateDropdown(
-  timeCategoryFilter,
-  getUniqueValues("timeCategory")
-);
-
-renderSources(sources);
-
-searchInput.addEventListener(
-  "input",
-  filterSources
-);
-
-languageFilter.addEventListener(
-  "change",
-  filterSources
-);
-
-sourceTypeFilter.addEventListener(
-  "change",
-  filterSources
-);
-
-eventCategoryFilter.addEventListener(
-  "change",
-  filterSources
-);
-
-timeCategoryFilter.addEventListener(
-  "change",
-  filterSources
-);
-
-resetFiltersButton.addEventListener(
-  "click",
-  resetFilters
-);
+searchInput.addEventListener("input", filterSources);
+languageFilter.addEventListener("change", filterSources);
+sourceTypeFilter.addEventListener("change", filterSources);
+eventCategoryFilter.addEventListener("change", filterSources);
+timeCategoryFilter.addEventListener("change", filterSources);
+resetFiltersButton.addEventListener("click", resetFilters);

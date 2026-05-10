@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quellenfinder</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Digitaler Quellenfinder</title>
+  <link rel="stylesheet" href="style.css?v=2" />
 </head>
 <body>
   <header class="header">
-    <h1>Quellenfinder für Unterrichtsmaterialien</h1>
-    <p>Filterbare Sammlung seriöser Quellen für Lehrkräfte und Schüler:innen</p>
+    <div class="header-content">
+      <p class="eyebrow">Geschichtsunterricht · Quellenrecherche · Unterrichtsmaterial</p>
+      <h1>Digitaler Quellenfinder für den Geschichtsunterricht</h1>
+      <p class="header-subtitle">
+        Eine filterbare Sammlung seriöser und didaktisch geeigneter Quellen für Lehrkräfte und Schüler:innen.
+      </p>
+    </div>
   </header>
 
   <main class="container">
     <section class="filters">
       <h2>Filter</h2>
+      <p class="filter-hint">Wähle einen Filter oder gib einen Suchbegriff ein.</p>
 
       <div class="filter-group">
         <label for="searchInput">Suche</label>
-        <input type="text" id="searchInput" placeholder="Nach Titel, Anbieter oder Beschreibung suchen..." />
+        <input type="text" id="searchInput" placeholder="Thema, Ereignis, Quelle oder Schlagwort..." />
       </div>
 
       <div class="filter-group">
@@ -54,7 +60,10 @@
 
     <section class="results-section">
       <div class="results-header">
-        <h2>Ergebnisse</h2>
+        <div>
+          <h2>Ergebnisse</h2>
+          <p class="results-intro">Passende Quellen werden hier angezeigt.</p>
+        </div>
         <p id="resultsCount"></p>
       </div>
 
@@ -63,6 +72,6 @@
   </main>
 
   <script src="data.js?v=2"></script>
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
